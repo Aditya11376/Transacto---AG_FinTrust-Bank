@@ -116,6 +116,19 @@ AG_FinTrust/
 
 ---
 
+### 📈 Future Enhancements
+
+- **OTP-Based Authentication**  
+  Integrate One-Time Password (OTP) verification during login and sensitive operations to enhance account security.
+
+- **Secure PIN Storage with Hashing**  
+  Upgrade the current Base64 encoding system to a more secure hashing mechanism (e.g., SHA-256 or bcrypt) for storing and verifying PINs, ensuring better protection of user credentials.
+
+- **Interest Calculation on Account Balance**  
+  Introduce periodic interest computation on user account balances, similar to savings accounts, with configurable interest rates and automated balance updates.
+
+---
+
 ## 📷 Hierarchical Class Structure
 
 ![Class Structure](docs/class_structure.png)
