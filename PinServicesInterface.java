@@ -10,8 +10,9 @@ import java.sql.Connection;
  *
  * @author Aditya Gupta
  * @version 1.0.0
+ * @since July 20, 2025
  */
-interface PinServicesInterface extends AG_FinTrustInterface{
+public interface PinServicesInterface extends AG_FinTrustInterface{
     boolean isAccountExists(Connection conn);
     void updatePin(Connection conn);
 

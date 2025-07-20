@@ -13,9 +13,10 @@ import static AG_FinTrust.InputUtil.sc;
  *
  * @author Aditya Gupta
  * @version 1.0.0
+ * @since July 20, 2025
  */
 
-class Account implements AccountInterface {
+public class Account implements AccountInterface {
     private Connection connection;
     private String account_name;
     private int age;

@@ -8,6 +8,7 @@ import java.sql.Connection;
  *
  * @author Aditya Gupta
  * @version 1.0.0
+ * @since July 20, 2025
  */
 
 public interface AccountDetailsInterface extends AG_FinTrustInterface{

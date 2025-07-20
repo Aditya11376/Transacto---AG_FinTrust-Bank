@@ -15,9 +15,10 @@ import static AG_FinTrust.InputUtil.sc;
  *
  * @author Aditya Gupta
  * @version 1.0.0
+ * @since July 20, 2025
  */
 
-class PinServices extends Account implements PinServicesInterface {
+public class PinServices extends Account implements PinServicesInterface {
     //take details (name,account_number,dob,mob_no)
     private int accountNumber;
     private long contactNumber;

@@ -9,9 +9,10 @@ package AG_FinTrust;
  *
  * @author Aditya Gupta
  * @version 1.0.0
+ * @since July 20, 2025
  */
 
-interface TransactionServicesInterface extends AG_FinTrustInterface{
+public interface TransactionServicesInterface extends AG_FinTrustInterface{
     boolean logTransaction();
     boolean checkAccountExist(int acc);
     boolean checkSufficientBalance();

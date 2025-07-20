@@ -10,6 +10,7 @@ import java.util.Scanner;
  *
  * @author Aditya Gupta
  * @version 1.0.0
+ * @since July 20, 2025
  */
 public class InputUtil {
     public static final Scanner sc = new Scanner(System.in);

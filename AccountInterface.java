@@ -9,7 +9,7 @@ import java.sql.Connection;
  * @author Aditya Gupta
  * @version 1.0.0
  */
-interface AccountInterface extends AG_FinTrustInterface{
+public interface AccountInterface extends AG_FinTrustInterface{
     public void createMyAccount(Connection connection) ;
 }
 
