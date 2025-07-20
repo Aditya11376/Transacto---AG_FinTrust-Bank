@@ -5,6 +5,16 @@ import java.time.LocalDate;
 
 import static AG_FinTrust.InputUtil.sc;
 
+/**
+ * AG_FinTrust - Account.java
+ *
+ * Handles creation and setup of new user bank accounts including personal details,
+ * balance initialization, and PIN setup.
+ *
+ * @author Aditya Gupta
+ * @version 1.0.0
+ */
+
 class Account implements AccountInterface {
     private Connection connection;
     private String account_name;

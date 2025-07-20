@@ -7,6 +7,16 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import static AG_FinTrust.InputUtil.sc;
 
+/**
+ * Handles secure PIN update functionality for user accounts.
+ * Validates identity and updates encoded PIN in the database.
+ *
+ * Part of the Transacto: AG_FinTrust system's PIN management module.
+ *
+ * @author Aditya Gupta
+ * @version 1.0.0
+ */
+
 class PinServices extends Account implements PinServicesInterface {
     //take details (name,account_number,dob,mob_no)
     private int accountNumber;

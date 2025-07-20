@@ -7,6 +7,14 @@ import java.sql.SQLException;
 
 import static AG_FinTrust.InputUtil.sc;
 
+/**
+ * AG_FinTrust - AccountDetails.java
+ *
+ * @author Aditya Gupta
+ * @version 1.0.0
+ */
+
+
 public class AccountDetails extends Account implements AccountDetailsInterface {
     private int accountNumber ;
     private String PIN;

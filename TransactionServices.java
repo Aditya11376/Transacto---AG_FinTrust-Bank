@@ -5,6 +5,16 @@
     import java.sql.ResultSet;
     import java.sql.SQLException;
     import static AG_FinTrust.InputUtil.sc;
+    /**
+     * Provides transactional operations such as deposit, withdrawal, and transfer
+     * in the Transacto: AG_FinTrust system. Handles PIN verification, account checks,
+     * and secure logging of all monetary movements between accounts.
+     *
+     * Supports rollback and commit mechanisms to ensure transactional integrity.
+     *
+     * @author Aditya Gupta
+     * @version 1.0.0
+     */
 
     public class TransactionServices extends AccountDetails implements TransactionServicesInterface {
 

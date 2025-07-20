@@ -3,6 +3,15 @@ package AG_FinTrust;
 import java.sql.*;
 import static AG_FinTrust.InputUtil.sc;
 
+/**
+ * This class is responsible for account creation in the Transacto: AG_FinTrust system.
+ * Handles user data input, validation, PIN setup, and account storage.
+ *
+ * @author Aditya Gupta
+ * @version 1.0.0
+ */
+
+
 public class Main {
     private static final String url = "";
     private static final String username = "";
