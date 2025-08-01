@@ -138,7 +138,7 @@ AG_FinTrust/
 ## 📌 Version History
 
 Want to see what's changed?  
-👉 [View full changelog →](./CHANGELOG.md)
+👉 [View full changelog →](./Changelog.md)
 
 ---
 
