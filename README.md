@@ -209,10 +209,6 @@ AG_FinTrust/
 - **v2.1.1** – Bugfix: Exits after 3 failed PIN attempts
 - **v3.1.0** – Major upgrade: Added interest calculation module
 
-- ### 📌 Version History
-Want to see what's changed?  
-👉 [View full changelog →](./Changelog.md)
-
 ---
 
 ## 📷 Hierarchical Class Structure
