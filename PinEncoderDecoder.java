@@ -9,9 +9,10 @@ import java.util.Base64;
  * Used across various modules of the Transacto: AG_FinTrust system.
  *
  * @author Aditya Gupta
- * @version 1.0.0
- * @since July 20, 2025
+ * @version 2.0.0
+ * @since August 02, 2025
  */
+
 public class PinEncoderDecoder {
 
     /**

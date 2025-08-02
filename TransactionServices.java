@@ -10,13 +10,12 @@ import static AG_FinTrust.InputUtil.sc;
  * in the Transacto: AG_FinTrust system. Handles PIN verification, account checks,
  * and secure logging of all monetary movements between accounts.
  *
- * Supports rollback and commit mechanisms to ensure transactional integrity.
+ * <p>Supports rollback and commit mechanisms to ensure transactional integrity.</p>
  *
  * @author Aditya Gupta
- * @version 1.0.0
- * @since July 20, 2025
+ * @version 2.0.0
+ * @since August 02, 2025
  */
-
 public class TransactionServices extends AccountDetails implements TransactionServicesInterface {
 
     private Connection connection;
@@ -26,6 +25,13 @@ public class TransactionServices extends AccountDetails implements TransactionSe
     private String PIN;
     private String transactionType;
     private double balance;
+
+    private String description;
+
+    //connectionConstructor
+    TransactionServices(Connection conn){
+        this.connection=conn;
+    }
 
     //transferTypeConstructor
     TransactionServices(int fromAccountNumber, String name, int toAccountNumber, Connection conn, double bal, String type){
@@ -66,7 +72,7 @@ public class TransactionServices extends AccountDetails implements TransactionSe
     }
 
     // match pin
-    boolean matchPin(int acc) {
+    final boolean matchPin(int acc) {
         String query = "SELECT COUNT(*) FROM pin_Details WHERE account_number = ? AND pin = ?";
         try (PreparedStatement preparedStatementCheck = this.connection.prepareStatement(query)) {
             preparedStatementCheck.setInt(1, acc);
@@ -84,12 +90,25 @@ public class TransactionServices extends AccountDetails implements TransactionSe
         return false;
     }
 
+    //add description of payment
+    private void addDescription(){
+        System.out.print("\nWant to add any description? (Yes/No): ");
+        String response = sc.nextLine().trim().toLowerCase();
+
+        if (response.equals("y") || response.equals("yes")) {
+            System.out.print("Write description: ");
+            this.description = sc.nextLine().trim();
+        } else {
+            this.description = null;
+        }
+    }
+
     //log transaction
     @Override
     public boolean logTransaction(){
         try{
             //add history;
-            String addQuery = "Insert into transaction_history (from_account,to_account,balance,transfer_type) values(?,?,?,?)";
+            String addQuery = "Insert into transaction_history (from_account,to_account,balance,transfer_type,intent,description) values(?,?,?,?,'Direct',?)";
             try (PreparedStatement p = connection.prepareStatement(addQuery)) {
                 if (this.fromAccountNumber != -1) {
                     p.setInt(1, this.fromAccountNumber);
@@ -105,6 +124,8 @@ public class TransactionServices extends AccountDetails implements TransactionSe
 
                 p.setDouble(3, this.balance);
                 p.setString(4, this.transactionType);
+                addDescription();
+                p.setString(5,this.description);
 
                 int rowsAffected = p.executeUpdate();
 
@@ -125,7 +146,7 @@ public class TransactionServices extends AccountDetails implements TransactionSe
 
     //check accounts exists function;
     @Override
-    public boolean checkAccountExist(int acc){
+    public final boolean checkAccountExist(int acc){
         try{
             String s = "Select count(*) from accounts where account_number =? ";
             PreparedStatement p = this.connection.prepareStatement(s);

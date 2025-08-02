@@ -14,8 +14,8 @@ import static AG_FinTrust.InputUtil.sc;
  * Part of the Transacto: AG_FinTrust system's PIN management module.
  *
  * @author Aditya Gupta
- * @version 1.0.0
- * @since July 20, 2025
+ * @version 2.0.0
+ * @since August 02, 2025
  */
 
 public class PinServices extends Account implements PinServicesInterface {

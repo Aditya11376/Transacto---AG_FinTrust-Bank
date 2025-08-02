@@ -4,21 +4,26 @@ import java.sql.*;
 import static AG_FinTrust.InputUtil.sc;
 
 /**
- * This class is responsible for account creation in the Transacto: AG_FinTrust system.
- * Handles user data input, validation, PIN setup, and account storage.
+ * Main class of Transacto: AG_FinTrust System.
+ * Entry point to start the application and provide different banking or UPI services.
+ *
+ * Responsibilities:
+ * <ul>
+ *     <li>Establish database connection</li>
+ *     <li>Handle user flow for account creation or service selection</li>
+ *     <li>Provide menu-based services for Banking and UPI</li>
+ * </ul>
  *
  * @author Aditya Gupta
- * @version 1.0.0
- * @since July 20, 2025
+ * @version 2.0.0
+ * @since August 02, 2025
  */
+public final class Main {
+    private static final String url = "jdbc:mysql---------------db";
+    private static final String username = "your_username";
+    private static final String password = "your_password";
 
-
-public class Main {
-    private static final String url = "";
-    private static final String username = "";
-    private static final String password = "";
-
-    static void checkServices(){
+    static void checkBankingServices(){
         System.out.print("\nWhat can I help you ? (Please select our services) : ");
         System.out.println("\n 1. Account Details");
         System.out.println(" 2. Deposit");
@@ -49,14 +54,55 @@ public class Main {
         return balance;
     }
 
-    static void provideServices(Connection conn){
+    static void provideUPIServices(Connection conn){
+        while(true){
+            checkUPIServices();
+            System.out.print("Enter your choice : ");
+            int choice = sc.nextInt();
+
+            UPI upi = new UPI(conn);
+            switch (choice){
+                case 1 : //set upi id
+                    upi.setUPI();
+                    break;
+                case 2 : //account details
+                    upi.displayAccountDetails();
+                    break;
+                case 3: //amount transaction
+                    System.out.print("Enter Your UPI-ID : ");
+                    sc.nextLine();
+                    String upi1 = sc.nextLine().trim().toLowerCase();
+                    System.out.print("Enter Receiver UPI-ID : ");
+                    String upi2 = sc.nextLine().trim().toLowerCase();
+                    UPITransactionServices upits = new UPITransactionServices(conn,upi1,upi2,inputBalanceForTransaction());
+                    upits.UPITransaction();
+                    break;
+                case 4: //exit
+                    System.out.println("\n===================================================================\nThank you for visiting us!\nHave a nice day.\n===================================================================");
+                    return;
+                default:
+                    System.out.println("\n===================================================================\nInvalid Choice!\nPlease try again.\nThank you!\n===================================================================");
+            }
+        }
+
+    }
+
+    static void checkUPIServices(){
+        System.out.print("\nWhat can I help you ? (Please select our services) : ");
+        System.out.println("\n 1. Create Your UPI-ID");
+        System.out.println(" 2. Account Details");
+        System.out.println(" 3. Transfer");
+        System.out.println(" 4. Exit\n");
+        //future enhancement -> upi to bank account
+    }
+
+    static void provideBankingServices(Connection conn){
         while(true){
 
-            checkServices();
+            checkBankingServices();
 
             System.out.print("Enter your choice : ");
             int choice = sc.nextInt();
-            sc.nextLine();
 
             switch (choice){
                 case 1 : //account details;
@@ -173,7 +219,7 @@ public class Main {
                     AccountInterface myAccount = new Account();
                     myAccount.createMyAccount(connection);
                     //services;
-                    provideServices(connection);
+                    provideBankingServices(connection);
 
                 }else{
                     System.out.println("\n===================================================================\nInvalid Statement!\nPlease try again.\nThank you!\n===================================================================");
@@ -181,8 +227,27 @@ public class Main {
 
                 }
             }else if(choice1=='Y' || choice1=='y'){
-                //services;
-                provideServices(connection);
+                System.out.println("\n===================================================================\n");
+                System.out.println("===== Select Service =====");
+                System.out.println("\n===================================================================\n");
+                System.out.println("1. Banking Services");
+                System.out.println("2. UPI Services\n");
+                System.out.print("Enter your choice : ");
+                int choice = sc.nextInt();
+                switch (choice){
+                    case 1: //net-banking services;
+                        System.out.println("\u001B[32m\nWelcome to AG FinTrust -> Banking Services\u001B[0m");
+                        provideBankingServices(connection);
+                        break;
+
+                    case 2: //upi services;
+                        System.out.println("\u001B[32m\nWelcome to AG FinTrust -> UPI Services\u001B[0m");
+                        provideUPIServices(connection);
+                        break;
+
+                    default:
+                        System.out.println("Invalid Choice!..");
+                }
 
             }else{
                 System.out.println("\n===================================================================\nInvalid Statement!\nPlease try again.\nThank you!\n===================================================================");

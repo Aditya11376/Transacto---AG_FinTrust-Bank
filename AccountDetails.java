@@ -10,11 +10,22 @@ import static AG_FinTrust.InputUtil.sc;
 /**
  * AG_FinTrust - AccountDetails.java
  *
+ * This class provides functionalities to view the details and transaction history
+ * of an account in the Transacto: AG_FinTrust system.
+ *
+ * <p>Responsibilities include:</p>
+ * <ul>
+ *   <li>Verifying account credentials (Account Number + PIN)</li>
+ *   <li>Displaying personal account details like name, balance, and contact</li>
+ *   <li>Displaying detailed transaction history of the account</li>
+ * </ul>
+ *
+ * <p>This class extends {@link Account} and implements {@link AccountDetailsInterface}.</p>
+ *
  * @author Aditya Gupta
- * @version 1.0.0
- * @since July 20, 2025
+ * @version 2.0.0
+ * @since August 02, 2025
  */
-
 
 public class AccountDetails extends Account implements AccountDetailsInterface {
     private int accountNumber ;
@@ -35,7 +46,6 @@ public class AccountDetails extends Account implements AccountDetailsInterface {
                 System.out.println("Invalid PIN.\n");
             }
         }
-
     }
 
     @Override
@@ -73,50 +83,56 @@ public class AccountDetails extends Account implements AccountDetailsInterface {
 
     //view my transaction
     @Override
-    public void viewMyTransaction(Connection connection){
-        String queryTransaction =  "SELECT * FROM transaction_history AS th " +
-                "JOIN pin_details AS p ON (p.account_number = th.from_account or p.account_number = th.to_account) " +
+    public void viewMyTransaction(Connection connection) {
+        String queryTransaction = "SELECT * FROM transaction_history AS th " +
+                "JOIN pin_details AS p ON (p.account_number = th.from_account OR p.account_number = th.to_account) " +
                 "WHERE p.account_number = ? AND p.pin = ? " +
                 "ORDER BY th.at_time ASC";
+
         takeDetailsToViewAccountDetails();
 
-        try(PreparedStatement p = connection.prepareStatement(queryTransaction)){
+        try (PreparedStatement p = connection.prepareStatement(queryTransaction)) {
+            p.setInt(1, accountNumber);
+            p.setString(2, PinEncoderDecoder.encode(PIN));
 
-            p.setInt(1,accountNumber);
-            p.setString(2,PinEncoderDecoder.encode(PIN));
+            try (ResultSet resultSet = p.executeQuery()) {
+                boolean hasResults = false;
 
-            ResultSet resultSet = p.executeQuery();
-            boolean hasResults = false;
-            System.out.println("\n====== Transaction History ======\n");
+                System.out.println("\n" + "=".repeat(114));
+                System.out.printf("%" + (114 / 2 + 12) + "s\n", " Transaction History ");
+                System.out.println("=".repeat(114));
 
-            int count = 1;
-            while (resultSet.next()) {
-                hasResults = true;
+                System.out.printf("%-5s  %-10s  %-10s  %-10s  %-10s %-20s %-10s %-20s\n",
+                        "Txn#", "From A/C", "To A/C", "Type", "Amount", "Time", "Intent", "Description");
+                System.out.println("-----  ----------  ----------  ----------  ---------- -------------------- ---------- --------------------");
 
-                int fromAccount = resultSet.getInt("from_account");
-                int toAccount = resultSet.getInt("to_account");
-                double amount = resultSet.getDouble("balance");
-                String type = resultSet.getString("transfer_type");
-                String time = resultSet.getString("at_time");
+                int count = 1;
+                while (resultSet.next()) {
+                    hasResults = true;
 
-                System.out.println("\nTransaction #" + (count++));
-                System.out.println("→ Type          : " + type);
-                System.out.println("→ From Account  : " + fromAccount);
-                System.out.println("→ To Account    : " + toAccount);
-                System.out.printf ("→ Amount        : ₹%.2f\n", amount);
-                System.out.println("→ Timestamp     : " + time);
-                System.out.println("-----------------------------");
+                    int fromAccount = resultSet.getInt("from_account");
+                    int toAccount = resultSet.getInt("to_account");
+                    double amount = resultSet.getDouble("balance");
+                    String type = resultSet.getString("transfer_type");
+                    String time = resultSet.getString("at_time");
+                    String intent = resultSet.getString("intent");
+                    String des = resultSet.getString("description");
+
+                    System.out.printf("%-5d  %-10s  %-10s  %-10s  ₹%-9.2f %-20s %-10s %-20s\n",
+                            count++, (fromAccount == 0 ? "-" : String.valueOf(fromAccount)), (toAccount == 0 ? "-": String.valueOf(toAccount)), type, amount, time, intent,
+                            (des == null || des.isEmpty() ? "-" : des));
+                }
+
+                if (!hasResults) {
+                    System.out.println("\nNo transactions found for this account.");
+                }
+
+                System.out.println("=".repeat(114));
             }
-
-            if(!hasResults){
-                System.out.println("No Transaction found for this account");
-            }
-
-            resultSet.close();
-
-        }catch (SQLException e){
-            System.out.println("Error fetching transactions: ");
+        } catch (SQLException e) {
+            System.out.println("e.getMessage()");
         }
     }
+
 
 }

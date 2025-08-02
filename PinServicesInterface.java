@@ -1,6 +1,7 @@
 package AG_FinTrust;
 
 import java.sql.Connection;
+
 /**
  * Interface for PIN-related services in the Transacto: AG_FinTrust system.
  * Declares methods for checking account existence and securely updating PINs.
@@ -9,9 +10,10 @@ import java.sql.Connection;
  * and ensure secure PIN updates using encoding mechanisms.
  *
  * @author Aditya Gupta
- * @version 1.0.0
- * @since July 20, 2025
+ * @version 2.0.0
+ * @since August 02, 2025
  */
+
 public interface PinServicesInterface extends AG_FinTrustInterface{
     boolean isAccountExists(Connection conn);
     void updatePin(Connection conn);
