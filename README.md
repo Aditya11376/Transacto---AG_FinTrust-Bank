@@ -221,6 +221,13 @@ Want to see what's changed?
 
 ---
 
+## 📌 Version History
+
+Want to see what's changed?  
+👉 [View full changelog →](./Changelog.md)
+
+---
+
 ## 📄 License
 
 This project is licensed under the **Apache License 2.0**. See the [LICENSE](License) file for details.
