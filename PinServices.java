@@ -1,124 +1,265 @@
 package AG_FinTrust;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.time.LocalDate;
+import java.sql.*;
 import static AG_FinTrust.InputUtil.sc;
 
 /**
- * Handles secure PIN update functionality for user accounts.
- * Validates identity and updates encoded PIN in the database.
+ * Main class of Transacto: AG_FinTrust System.
+ * Entry point to start the application and provide different banking or UPI services.
  *
- * Part of the Transacto: AG_FinTrust system's PIN management module.
+ * Responsibilities:
+ * <ul>
+ *     <li>Establish database connection</li>
+ *     <li>Handle user flow for account creation or service selection</li>
+ *     <li>Provide menu-based services for Banking and UPI</li>
+ * </ul>
  *
  * @author Aditya Gupta
  * @version 2.0.0
  * @since August 02, 2025
  */
+public final class Main {
+    private static final String url = "jdbc:mysql://127.0.0.1:3306/ag_fintrust";
+    private static final String username = "root";
+    private static final String password = "aditya@sql27";
 
-public class PinServices extends Account implements PinServicesInterface {
-    //take details (name,account_number,dob,mob_no)
-    private int accountNumber;
-    private long contactNumber;
-    private LocalDate dob;
-    private String accountName;
+    static void checkBankingServices(){
+        System.out.print("\nWhat can I help you ? (Please select our services) : ");
+        System.out.println("\n 1. Account Details");
+        System.out.println(" 2. Deposit");
+        System.out.println(" 3. Withdraw");
+        System.out.println(" 4. Transfer");
+        System.out.println(" 5. Transaction History");
+        System.out.println(" 6. Update PIN");
+        System.out.println(" 7. Exit\n");
+    }
 
-//  Take Details of Account Holder;
-    void takeDetailsToUpdatePin(){
-        System.out.println("\nEnter your details for change/update of your account PIN :- \n");
-
-        System.out.print(" 1. Enter your Account Name : ");
-        accountName = sc.nextLine();
-
-        System.out.print(" 2. Enter your Account Number : ");
-        accountNumber = sc.nextInt();
-
-        while(true){
-            System.out.print(" 3. Enter your Contact Number : ");
-            contactNumber = sc.nextLong();
-            if(Account.isValidContact(contactNumber)){
-                break;
-            }else{
-                System.out.println("Invalid Contact Number!");
+    //take input balance;
+    static double inputBalanceForTransaction(){
+        double balance;
+        while (true) {
+            System.out.print("Enter Amount : ");
+            if (sc.hasNextDouble()) {
+                balance = sc.nextDouble();
+                if (balance > 0) {
+                    break;
+                } else {
+                    System.out.println("Invalid amount. Amount must be greater than zero.");
+                }
+            } else {
+                System.out.println("Invalid input. Please enter a number.");
+                sc.next(); // Clear invalid input
             }
         }
+        return balance;
+    }
 
+    static void provideUPIServices(Connection conn){
         while(true){
-            try{
-                System.out.println(" 4. Enter your Date Of Birth - ");
-                System.out.print("Year : ");
-                int year = sc.nextInt();
-                System.out.print("Month : ( 1-12 ) ");
-                int month = sc.nextInt();
-                System.out.print("Date : ");
-                int day = sc.nextInt();
+            checkUPIServices();
+            System.out.print("Enter your choice : ");
+            int choice = sc.nextInt();
 
-                dob = LocalDate.of(year, month, day);
-                break;
-            }catch (Exception e){
-                System.out.println("\nInvalid Date Of Birth.");
+            UPI upi = new UPI(conn);
+            switch (choice){
+                case 1 : //set upi id
+                    upi.setUPI();
+                    break;
+                case 2 : //account details
+                    upi.displayAccountDetails();
+                    break;
+                case 3: //amount transaction
+                    System.out.print("Enter Your UPI-ID : ");
+                    sc.nextLine();
+                    String upi1 = sc.nextLine().trim().toLowerCase();
+                    System.out.print("Enter Receiver UPI-ID : ");
+                    String upi2 = sc.nextLine().trim().toLowerCase();
+                    UPITransactionServices upits = new UPITransactionServices(conn,upi1,upi2,inputBalanceForTransaction());
+                    upits.UPITransaction();
+                    break;
+                case 4: //exit
+                    System.out.println("\n===================================================================\nThank you for visiting us!\nHave a nice day.\n===================================================================");
+                    return;
+                default:
+                    System.out.println("\n===================================================================\nInvalid Choice!\nPlease try again.\nThank you!\n===================================================================");
             }
         }
 
     }
 
-//  Check Match of account
-    @Override
-    public boolean isAccountExists(Connection conn){
-       try{
-           String query = "Select count(*) from accounts where lower(account_name) = ? and contact_number = ? and date_of_birth = ? and account_number = ?";
-           PreparedStatement  preparedStatement = conn.prepareStatement(query);
-           preparedStatement.setString(1,accountName.toLowerCase());
-           preparedStatement.setString(2,String.valueOf(contactNumber));
-           preparedStatement.setDate(3,java.sql.Date.valueOf(dob));
-           preparedStatement.setInt(4,accountNumber);
-
-
-           ResultSet resultSet = preparedStatement.executeQuery();
-           if(resultSet.next() && resultSet.getInt(1)==1){
-               preparedStatement.close();
-               return true;
-           }
-           preparedStatement.close();
-       }catch (SQLException e){
-           System.out.println(e.getMessage());
-       }
-       return false;
+    static void checkUPIServices(){
+        System.out.print("\nWhat can I help you ? (Please select our services) : ");
+        System.out.println("\n 1. Create Your UPI-ID");
+        System.out.println(" 2. Account Details");
+        System.out.println(" 3. Transfer");
+        System.out.println(" 4. Exit\n");
+        //future enhancement -> upi to bank account
     }
 
-    @Override
-//  If exists then go ahead else stop
-    public void updatePin(Connection conn){
-        try{
-                //take and check pin_number
-                String pin_number;
-                System.out.println("==========================================================================");
-                while(true){
-                    System.out.print("\nUPDATE your 6-Digit Pin Number here : ");
-                    pin_number = sc.next();
-                    System.out.println("(Note :-> Remember your pin & never share it with anyone.)\n");
-                    if(Account.isValidPin(pin_number)){
-                        break;
+    static void provideBankingServices(Connection conn){
+        while(true){
+
+            checkBankingServices();
+
+            System.out.print("Enter your choice : ");
+            int choice = sc.nextInt();
+
+            switch (choice){
+                case 1 : //account details;
+                {
+                    AccountDetailsInterface obj = new AccountDetails();
+                    obj.viewMyAccountDetails(conn);
+                }
+                break;
+
+                case 2 : //deposit
+                {
+                    System.out.print("Enter Your Name : ");
+                    String name = sc.next();
+
+                    System.out.print("Enter Your Account Number : ");
+                    int number = sc.nextInt();
+
+                    TransactionServicesInterface obj = new TransactionServices(name,number,conn,inputBalanceForTransaction(),"Deposit");
+                    obj.moneyDepositTransaction();
+                }
+                    break;
+
+                case 3 : //withdraw
+                {
+                    System.out.print("Enter Your Name : ");
+                    String name = sc.next();
+
+                    System.out.print("Enter Your Account Number : ");
+                    int number = sc.nextInt();
+
+                    TransactionServicesInterface obj = new TransactionServices(number,name,conn,inputBalanceForTransaction(),"Withdraw");
+                    obj.moneyWithdrawTransaction();
+
+                }
+                    break;
+
+                case 4 : //transfer
+                {
+                    System.out.print("Enter Your Name : ");
+                    String name = sc.next();
+
+                    System.out.println("Enter Your Account Number : ");
+                    System.out.print("From : ");
+                    int number1 = sc.nextInt();
+                    System.out.print("To : ");
+                    int number2 = sc.nextInt();
+
+                    TransactionServicesInterface obj = new TransactionServices(number1,name,number2,conn,inputBalanceForTransaction(),"Transfer");
+                    obj.moneyTransferTransaction();
+
+                }
+                    break;
+
+                case 5 : //transaction history
+                {
+                    AccountDetailsInterface obj = new AccountDetails();
+                    obj.viewMyTransaction(conn);
+                }
+                    break;
+
+                case 6 : //update my pin
+                {
+                    PinServices obj = new PinServices();
+                    obj.takeDetailsToUpdatePin();     // Take input
+                    if(obj.isAccountExists(conn)) {   // Then check if that input exists in DB
+                        obj.updatePin(conn);          // Then do the update
                     }else{
-                        System.out.print("❌ Invalid Pin (PIN limit exceeded/no PIN entered). Please re-enter a 6-digit number.");
+                        System.out.println("No Such Account Exist.");
+                        return;
                     }
                 }
-                //update query
-                String query = "Update pin_details set pin = ? where account_number = ?";
-                PreparedStatement preparedStatement = conn.prepareStatement(query);
+                    break;
 
-                preparedStatement.setString(1,PinEncoderDecoder.encode(pin_number));
-                preparedStatement.setInt(2,accountNumber);
+                case 7 : //exit
+                    System.out.println("\n===================================================================\nThank you for visiting us!\nHave a nice day.\n===================================================================");
+                    return;
 
-                int affect = preparedStatement.executeUpdate();
-                System.out.println(affect>0? "\nPIN updated\n":"Some issue occurs!\nPIN is not updated.\nPlease try again.\n");
-                preparedStatement.close();
+                default :
+                    System.out.println("\n===================================================================\nInvalid Choice!\nPlease try again.\nThank you!\n===================================================================");
 
-        }catch(SQLException e){
-            System.out.println(e.getMessage());
+            }
         }
     }
 
+    public static void main(String[] args) {
+        System.out.println(String.format("===================================================================\n|||||==========>>>>>  Welcome To 'AG FinTrust' <<<<<==========|||||\n===================================================================\n"));
+
+        //loading driver
+        try{
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        }catch (ClassNotFoundException e){
+            System.out.println(e.getMessage());
+        }
+
+        try{
+            //establishing connection
+            Connection connection = DriverManager.getConnection(url,username,password);
+
+            //welcome to AG FinTrust
+            System.out.print("Do you have an account in * AG FinTrust * bank ? : ( Yes[Y] / No[N] ) ");
+            char choice1 = sc.next().charAt(0);
+
+            if(choice1=='N' || choice1=='n'){
+
+                System.out.print("\nDo you want to create an account ? : ( Yes[Y] / No[N] ) ");
+                char choice2 = sc.next().charAt(0);
+
+                if(choice2 == 'n' || choice2=='N'){
+                    System.out.println("\n===================================================================\nThank you for visiting us!\nHave a nice day.\n===================================================================");
+                    return;
+
+                }else if(choice2 == 'y' || choice2=='Y'){
+                    //creating an account;
+                    AccountInterface myAccount = new Account();
+                    myAccount.createMyAccount(connection);
+                    //services;
+                    provideBankingServices(connection);
+
+                }else{
+                    System.out.println("\n===================================================================\nInvalid Statement!\nPlease try again.\nThank you!\n===================================================================");
+                    return;
+
+                }
+            }else if(choice1=='Y' || choice1=='y'){
+                System.out.println("\n===================================================================\n");
+                System.out.println("===== Select Service =====");
+                System.out.println("\n===================================================================\n");
+                System.out.println("1. Banking Services");
+                System.out.println("2. UPI Services\n");
+                System.out.print("Enter your choice : ");
+                int choice = sc.nextInt();
+                switch (choice){
+                    case 1: //net-banking services;
+                        System.out.println("\u001B[32m\nWelcome to AG FinTrust -> Banking Services\u001B[0m");
+                        provideBankingServices(connection);
+                        break;
+
+                    case 2: //upi services;
+                        System.out.println("\u001B[32m\nWelcome to AG FinTrust -> UPI Services\u001B[0m");
+                        provideUPIServices(connection);
+                        break;
+
+                    default:
+                        System.out.println("Invalid Choice!..");
+                }
+
+            }else{
+                System.out.println("\n===================================================================\nInvalid Statement!\nPlease try again.\nThank you!\n===================================================================");
+                return;
+
+            }
+            connection.close();
+
+        }catch (SQLException e){
+            System.out.println(e.getMessage());
+        }
+
+    }
 }
+
